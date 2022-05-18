@@ -5,12 +5,13 @@ Undo* createUndo()
 	return new StudentUndo;
 }
 
+// add action to the record to be potentially undone later
 void StudentUndo::submit(const Action action, int row, int col, char ch) {
 	if (!changes.empty()) {
 		operations* top = changes.top();
 		if (top->action == action) {
 			if (action == Action::DELETE) {
-				if (row == top->row && (col == top->col || col == top->col - 1)) {
+				if (row == top->row && (col == top->col || col == top->col - 1)) { // undo delete with previous deletes if at same spot or adjacent
 					if (col == top->col) {
 						top->row = row;
 						top->col = col;
@@ -21,35 +22,24 @@ void StudentUndo::submit(const Action action, int row, int col, char ch) {
 						top->col = col;
 						top->str.insert(0, 1, ch);
 					}
-				}
-				else {
-					changes.push(new operations(action, row, col, ch));
+					return;
 				}
 			}
 			else if (action == Action::INSERT) {
-				if (col == top->col + top->count && row == top->row) {
+				if (col == top->col + top->count && row == top->row) { // undo insertion with previous insertions if adjacent
 					top->count++;
 				}
-				else {
-					changes.push(new operations(action, row, col, ch));
-				}
+				return;
 			}
-			else if (action == Action::JOIN) {
-				changes.push(new operations(action, row, col, ch));
-			}
-			else if (action == Action::SPLIT) {
-				changes.push(new operations(action, row, col, ch));
+			else if (action == Action::ERROR) {
+				return;
 			}
 		}
-		else {
-			changes.push(new operations(action, row, col, ch));
-		}
 	}
-	else {
-		changes.push(new operations(action, row, col, ch));
-	}
+	changes.push(new operations(action, row, col, ch));
 }
 
+// undo the last action on the stack and remove the action
 StudentUndo::Action StudentUndo::get(int &row, int &col, int& count, std::string& text) {
 	if (!changes.empty()) {
 		operations* top = changes.top();
@@ -86,6 +76,7 @@ StudentUndo::Action StudentUndo::get(int &row, int &col, int& count, std::string
 	}
 }
 
+// remove all undo actions from the stack
 void StudentUndo::clear() {
 	while (!changes.empty()) {
 		delete changes.top();

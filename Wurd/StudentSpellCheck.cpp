@@ -14,6 +14,7 @@ StudentSpellCheck::~StudentSpellCheck() {
 	killTrie(root);
 }
 
+// load the dictionary file into the trie
 bool StudentSpellCheck::load(std::string dictionaryFile) {
 	std::ifstream dict(dictionaryFile);
 	std::string line;
@@ -47,6 +48,7 @@ bool StudentSpellCheck::load(std::string dictionaryFile) {
 	return true;
 }
 
+// find all valid spelling suggestions for a given word and push them to the 'suggestions' vector
 bool StudentSpellCheck::spellCheck(std::string word, int max_suggestions, std::vector<std::string>& suggestions) {
 	int n = word.length();
 	Trie* curNode = root;
@@ -67,6 +69,7 @@ bool StudentSpellCheck::spellCheck(std::string word, int max_suggestions, std::v
 	return false; 
 }
 
+// spell check a given string, pushing positions of incorrectly spelled words to the 'problems' vector
 void StudentSpellCheck::spellCheckLine(const std::string& line, std::vector<SpellCheck::Position>& problems) {
 	int start = 0;
 	int end;
@@ -90,7 +93,7 @@ void StudentSpellCheck::spellCheckLine(const std::string& line, std::vector<Spel
 				for (; i < n; i++) {
 					if (isalpha(word[i]) && curNode->children[tolower(word[i]) - 'a']) {
 						curNode = curNode->children[tolower(word[i]) - 'a'];
-						if (i == n - 1 && !curNode->isEnd) {//make sure word doesn't just exist, but is also a real word
+						if (i == n - 1 && !curNode->isEnd) { // make sure word doesn't just exist, but is also a real word
 							isFound = false;
 							break;
 						}
@@ -98,7 +101,7 @@ void StudentSpellCheck::spellCheckLine(const std::string& line, std::vector<Spel
 					}
 					if (word[i] == '\'' && curNode->children[26]) {
 						curNode = curNode->children[26];
-						if (i == n - 1 && !curNode->isEnd) {//make sure word doesn't just exist, but is also a real word
+						if (i == n - 1 && !curNode->isEnd) { // make sure word doesn't just exist, but is also a real word
 							isFound = false;
 							break;
 						}
@@ -127,7 +130,7 @@ void StudentSpellCheck::spellCheckLine(const std::string& line, std::vector<Spel
 				for (; i < n; i++) {
 					if (isalpha(word[i]) && curNode->children[tolower(word[i]) - 'a']) {
 						curNode = curNode->children[tolower(word[i]) - 'a'];
-						if (i == n - 1 && !curNode->isEnd) {//make sure word doesn't just exist, but is also a real word
+						if (i == n - 1 && !curNode->isEnd) { // make sure word doesn't just exist, but is also a real word
 							isFound = false;
 							break;
 						}
@@ -135,7 +138,7 @@ void StudentSpellCheck::spellCheckLine(const std::string& line, std::vector<Spel
 					}
 					if (word[i] == '\'' && curNode->children[26]) {
 						curNode = curNode->children[26];
-						if (i == n - 1 && !curNode->isEnd) {//make sure word doesn't just exist, but is also a real word
+						if (i == n - 1 && !curNode->isEnd) { // make sure word doesn't just exist, but is also a real word
 							isFound = false;
 							break;
 						}
@@ -152,6 +155,7 @@ void StudentSpellCheck::spellCheckLine(const std::string& line, std::vector<Spel
 	}
 }
 
+// deallocate the trie entirely
 void StudentSpellCheck::killTrie(Trie* root) {
 	if (root == nullptr) {
 		return;
@@ -163,6 +167,7 @@ void StudentSpellCheck::killTrie(Trie* root) {
 	delete root;
 }
 
+// find a spelling suggestion based on the provided dictionary
 void StudentSpellCheck::findSug(std::string word, int depth, bool oneoff, Trie* node, std::vector<std::string>& strvec, std::string curstr, bool& found) {
 	for (int i = 0; i < 27; i++) {
 		if (node->children[i]) {

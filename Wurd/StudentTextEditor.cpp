@@ -21,6 +21,7 @@ StudentTextEditor::~StudentTextEditor()
 	linescont.clear();
 }
 
+// load an existing file into the editor
 bool StudentTextEditor::load(std::string file) {
 	std::string s;
 	std::ifstream loadfile(file);
@@ -39,6 +40,7 @@ bool StudentTextEditor::load(std::string file) {
 	return true;
 }
 
+// save contents of the editor to a file (new or existing)
 bool StudentTextEditor::save(std::string file) {
 	std::ofstream savefile(file);
 	if (!savefile) {
@@ -53,6 +55,7 @@ bool StudentTextEditor::save(std::string file) {
 	return true;
 }
 
+// delete everything
 void StudentTextEditor::reset() {
 	linescont.clear();
 	getUndo()->clear();
@@ -60,7 +63,8 @@ void StudentTextEditor::reset() {
 	cur_col = 0;
 }
 
-void StudentTextEditor::move(Dir dir) {
+// change the cursor position
+void StudentTextEditor::move(TextEditor::Dir dir) {
 	int n = linescont.size() - 1;
 	std::list<std::string>::iterator iter = rowNode;
 	switch (dir)
@@ -122,10 +126,12 @@ void StudentTextEditor::move(Dir dir) {
 	}
 }
 
+// delete character AND record action for undo
 void StudentTextEditor::del() {
 	delHelp(true);
 }
 
+// backspace, record for undo
 void StudentTextEditor::backspace() {
 	if (cur_col > 0) {
 		char erasedchar = (*rowNode)[cur_col - 1];
@@ -147,19 +153,23 @@ void StudentTextEditor::backspace() {
 	}
 }
 
+// insert character and record action for undo
 void StudentTextEditor::insert(char ch) {
 	insertHelp(ch, true);
 }
 
+// enter new line, record action for undo
 void StudentTextEditor::enter() {
 	enterHelp(true);
 }
 
+// gives the position of the cursor
 void StudentTextEditor::getPos(int& row, int& col) const {
 	row = cur_row;
 	col = cur_col;
 }
 
+// retrieves 'numRows' lines of text starting from 'startRow', putting them into 'lines'
 int StudentTextEditor::getLines(int startRow, int numRows, std::vector<std::string>& lines) const {
 	int n = linescont.size();
 	if (startRow < 0 || numRows < 0 || startRow > n) {
@@ -189,6 +199,7 @@ int StudentTextEditor::getLines(int startRow, int numRows, std::vector<std::stri
 	return lines.size();
 }
 
+// undo next most recent action
 void StudentTextEditor::undo() {
 	int row;
 	int col;
@@ -211,7 +222,7 @@ void StudentTextEditor::undo() {
 		}
 		cur_col = col;
 		int n = text.length();
-		for (int i = 0; i < n; i++) { //insert func w/o submit method (to prevent undo of undo)
+		for (int i = 0; i < n; i++) { // insert func w/o submit method (to prevent undo of undo)
 			insertHelp(text[i], false);
 		}
 		cur_col -= n;
@@ -231,7 +242,7 @@ void StudentTextEditor::undo() {
 			}
 		}
 		cur_col = col;
-		for (int i = 0; i < count; i++) { //del func w/o submit method (to prevent undo of undo)
+		for (int i = 0; i < count; i++) { // del func w/o submit method (to prevent undo of undo)
 			delHelp(false);
 		}
 	}
@@ -249,7 +260,7 @@ void StudentTextEditor::undo() {
 				rowNode--;
 			}
 		}
-		cur_col = col; //enter func w/o submit method (to prevent undo of undo)
+		cur_col = col; // enter func w/o submit method (to prevent undo of undo)
 		enterHelp(false);
 		move(TextEditor::Dir::LEFT);
 	}
@@ -267,7 +278,7 @@ void StudentTextEditor::undo() {
 				rowNode--;
 			}
 		}
-		cur_col = col; //del func w/o submit method (to prevent undo of undo)
+		cur_col = col; // del func w/o submit method (to prevent undo of undo)
 		delHelp(false);
 	}
 	else {
@@ -275,6 +286,7 @@ void StudentTextEditor::undo() {
 	}
 }
 
+// insert character into the editor; 'submit' determines whether to record the action for an undo
 void StudentTextEditor::insertHelp(char ch, bool submit) {
 	if (ch == '\t') {
 		std::list<std::string>::iterator it = rowNode;
@@ -317,6 +329,7 @@ void StudentTextEditor::insertHelp(char ch, bool submit) {
 	}
 }
 
+// delete a character; 'submit' determines whether to record the action for an undo
 void StudentTextEditor::delHelp(bool submit) {
 	char curchar = (*rowNode)[cur_col];
 	if (curchar) {
@@ -338,6 +351,7 @@ void StudentTextEditor::delHelp(bool submit) {
 	}
 }
 
+// enter a new line; 'submit' determines whether to record the action for an undo
 void StudentTextEditor::enterHelp(bool submit) {
 	std::list<std::string>::iterator it = rowNode;
 	if (rowNode != linescont.end()) {
