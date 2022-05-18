@@ -7,3 +7,5 @@ will need to configure the PDCurses library differently if you wish to run this 
 From there you can open a text file with `Ctrl + L`, save editor contents to a file (existing or not) with `Ctrl + S`, undo your next most recent action with
 `Ctrl + Z`, load your own dictionary (if you don't want the default) with `Ctrl + D`, and quit the application with `Ctrl + X`. Positioning your cursor over a
 misspelled word will offer spelling suggestions at the bottom of the editor. You can change the theme of the editor in the `main.cpp` file if you like.
+
+<img src="wurd.jpg" />
